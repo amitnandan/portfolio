@@ -65,9 +65,8 @@ export default function BlurHalo({
   return (
     <>
       <div
-        className={`pointer-events-none fixed ${BLUR_CLASS[intensity]} backdrop-saturate-150 ${
-          pulse ? "animate-halo-pulse" : ""
-        }`}
+        className={`pointer-events-none fixed ${BLUR_CLASS[intensity]} backdrop-saturate-150 ${pulse ? "animate-halo-pulse" : ""
+          }`}
         style={{
           ...style,
           opacity,

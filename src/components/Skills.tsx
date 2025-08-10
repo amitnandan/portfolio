@@ -103,7 +103,7 @@ export default function Skills() {
             transition={{ duration: 0.6 }}
             className="text-3xl font-bold text-white mb-10 text-center"
           >
-              Skills
+            Skills
           </motion.h3>
 
           <motion.p

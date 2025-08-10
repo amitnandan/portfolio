@@ -6,7 +6,7 @@ import { useCallback } from "react";
 
 type Props = {
   phrases?: string[];
-  toSkillsAnchor?: string; 
+  toSkillsAnchor?: string;
 };
 
 export default function HeroAskSkills({
@@ -17,7 +17,7 @@ export default function HeroAskSkills({
     "AWS (EC2, S3) · Docker · CI/CD (basic)",
     "SQL · MySQL · Hibernate/JPA",
   ],
-  toSkillsAnchor, 
+  toSkillsAnchor,
 }: Props) {
   const go = useCallback(() => {
     if (!toSkillsAnchor) return;
@@ -42,17 +42,17 @@ export default function HeroAskSkills({
           ].join(" ")}
           {...(toSkillsAnchor
             ? {
-                role: "button",
-                tabIndex: 0,
-                onClick: go,
-                onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    go();
-                  }
-                },
-                title: "View full skills",
-              }
+              role: "button",
+              tabIndex: 0,
+              onClick: go,
+              onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  go();
+                }
+              },
+              title: "View full skills",
+            }
             : {})}
         >
           <div id="ask-label" className="text-xs text-white/60">
