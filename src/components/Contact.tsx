@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 
 const isEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 
+type ContactResponse = { ok: boolean; id?: string | null; error?: string };
+
 export default function Contact() {
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -22,16 +24,19 @@ export default function Contact() {
 
   const showNameError = attempted && nameEmpty;
   const showMessageError = attempted && messageEmpty;
-  const showEmailError = Boolean(
-    (attempted && (emailEmpty || emailBad)) || (!attempted && !!touched.email && emailBad)
-  );
+  const showEmailError =
+    (attempted && (emailEmpty || emailBad)) || (!attempted && !!touched.email && emailBad);
 
   const formValid = !nameEmpty && !emailEmpty && !emailBad && !messageEmpty;
 
   const abortRef = useRef<AbortController | null>(null);
+  const resetTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    return () => { abortRef.current?.abort(); };
+    return () => {
+      abortRef.current?.abort();
+      if (resetTimerRef.current) window.clearTimeout(resetTimerRef.current);
+    };
   }, []);
 
   async function handleSend() {
@@ -52,8 +57,13 @@ export default function Contact() {
       data.append("message", message.trim());
 
       const res = await fetch("/api/contact", { method: "POST", body: data, signal: ac.signal });
-      let json: any = null;
-      try { json = await res.json(); } catch {}
+
+      let json: ContactResponse | null = null;
+      try {
+        json = (await res.json()) as ContactResponse;
+      } catch {
+        // ignore JSON parse errors; handle via res.ok below
+      }
 
       if (!res.ok || !json?.ok) {
         const msg =
@@ -61,36 +71,46 @@ export default function Contact() {
           (res.status >= 500
             ? "Server error. Please try again in a moment."
             : res.status >= 400
-            ? "Please check your details and try again."
-            : "Failed to send message. Please try again later.");
+              ? "Please check your details and try again."
+              : "Failed to send message. Please try again later.");
         setStatus("error");
         setErrorMsg(msg);
         return;
       }
 
       setStatus("success");
-      setName(""); setEmail(""); setMessage("");
-      setAttempted(false); setTouched({});
-      const t = setTimeout(() => setStatus("idle"), 4000);
-      return () => clearTimeout(t);
-    } catch (err: any) {
-      if (err?.name === "AbortError") return;
+      setName("");
+      setEmail("");
+      setMessage("");
+      setAttempted(false);
+      setTouched({});
+
+      if (resetTimerRef.current) window.clearTimeout(resetTimerRef.current);
+      resetTimerRef.current = window.setTimeout(() => setStatus("idle"), 4000);
+    } catch (err: unknown) {
+      // Abort errors are expected during unmount or rapid resubmits
+      if (err instanceof DOMException && err.name === "AbortError") return;
       setStatus("error");
       setErrorMsg("Network error. Please try again.");
     }
   }
 
   function handleReset() {
-    setName(""); setEmail(""); setMessage("");
-    setAttempted(false); setTouched({});
-    setStatus("idle"); setErrorMsg("");
+    setName("");
+    setEmail("");
+    setMessage("");
+    setAttempted(false);
+    setTouched({});
+    setStatus("idle");
+    setErrorMsg("");
     abortRef.current?.abort();
+    if (resetTimerRef.current) window.clearTimeout(resetTimerRef.current);
   }
 
   const fieldClass = (showErr: boolean) =>
     `w-full bg-white/5 border rounded px-3 py-2 text-white placeholder-white/50 transition
      ${showErr ? "border-red-500/60 focus:outline-none focus:border-red-400"
-               : "border-white/10 focus:border-white/30 focus:ring-1 focus:ring-white/20"}`;
+      : "border-white/10 focus:border-white/30 focus:ring-1 focus:ring-white/20"}`;
 
   return (
     <section id="contact" className="relative pb-28">
@@ -98,12 +118,18 @@ export default function Contact() {
         <h3 className="text-3xl font-bold text-white mb-10 text-center">Contact</h3>
 
         {status === "success" && (
-          <div className="mt-6 mx-auto max-w-xl rounded-md border border-white/10 bg-green-500/10 text-green-200 px-4 py-3 text-sm text-center" role="status">
+          <div
+            className="mt-6 mx-auto max-w-xl rounded-md border border-white/10 bg-green-500/10 text-green-200 px-4 py-3 text-sm text-center"
+            role="status"
+          >
             ✅ Thanks! Your message has been sent.
           </div>
         )}
         {status === "error" && (
-          <div className="mt-6 mx-auto max-w-xl rounded-md border border-red-500/30 bg-red-500/10 text-red-200 px-4 py-3 text-sm text-center" role="alert">
+          <div
+            className="mt-6 mx-auto max-w-xl rounded-md border border-red-500/30 bg-red-500/10 text-red-200 px-4 py-3 text-sm text-center"
+            role="alert"
+          >
             {errorMsg}
           </div>
         )}
@@ -111,14 +137,17 @@ export default function Contact() {
         <form
           noValidate
           className="mt-6 grid gap-4 max-w-xl mx-auto"
-          onSubmit={(e) => { e.preventDefault(); handleSend(); }}
+          onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
+            e.preventDefault();
+            void handleSend();
+          }}
         >
           {/* Name */}
           <div>
             <input
               name="name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
               placeholder="Your name"
               autoComplete="name"
               autoCapitalize="words"
@@ -141,7 +170,7 @@ export default function Contact() {
             <input
               name="email"
               value={email}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setEmail(e.target.value);
                 if (!touched.email) setTouched({ email: true });
               }}
@@ -168,7 +197,7 @@ export default function Contact() {
             <textarea
               name="message"
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMessage(e.target.value)}
               rows={4}
               placeholder="How can I help?"
               autoCorrect="off"
@@ -208,7 +237,10 @@ export default function Contact() {
         </form>
 
         <div className="mt-4 text-sm text-white/60 text-center">
-          Or email directly: <a href="mailto:a.amitnandan@gmail.com" className="underline">a.amitnandan@gmail.com</a>
+          Or email directly:{" "}
+          <a href="mailto:a.amitnandan@gmail.com" className="underline">
+            a.amitnandan@gmail.com
+          </a>
         </div>
       </div>
     </section>

@@ -68,8 +68,9 @@ export function useNetworkCanvas({
       const w = canvas.clientWidth, h = canvas.clientHeight;
 
       let haloCenter = { x: -9999, y: -9999 };
-      let fadeInner = innerFadeRadius;
+      const fadeInner = innerFadeRadius;   // <- const fixes prefer-const
       let fadeOuter = outerFadeRadius;
+
       if (haloEl) {
         const r = haloEl.getBoundingClientRect();
         haloCenter = { x: r.left + r.width / 2, y: r.top + r.height / 2 };

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 
 type Item = {
   id: string;
@@ -57,6 +58,7 @@ export default function HeroTechCloud() {
 
     const tick = () => {
       if (!alive) return;
+
       const idx = Math.floor(Math.random() * items.length);
       setItems((prev) => prev.map((it, i) => (i === idx ? { ...it, fading: true } : it)));
 
@@ -84,7 +86,7 @@ export default function HeroTechCloud() {
       timeouts.current.forEach((id) => clearTimeout(id));
       timeouts.current = [];
     };
-  }, [prefersReduced]);
+  }, [prefersReduced, items.length]); // ✅ include items.length
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
@@ -109,7 +111,11 @@ export default function HeroTechCloud() {
   }, []);
 
   return (
-    <div ref={containerRef} className="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden>
+    <div
+      ref={containerRef}
+      className="pointer-events-none absolute inset-0 flex items-center justify-center"
+      aria-hidden
+    >
       <div className="relative h-[360px] w-[360px] md:h-[400px] md:w-[400px]">
         <div
           className="absolute inset-0 rounded-full blur-2xl opacity-35"
@@ -160,13 +166,13 @@ export default function HeroTechCloud() {
                     willChange: "transform, filter",
                   }}
                 >
-                  <img
+                  <Image
                     src={it.src}
                     width={it.w}
                     height={it.w}
                     alt={it.alt}
                     className="saturate-110"
-                    loading="eager"
+                    priority
                   />
                 </div>
               </div>
