@@ -1,5 +1,6 @@
+// app/sitemap.ts
 import type { MetadataRoute } from "next";
-
+import { siteUrl } from "@/lib/seo";
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [{ url: "https://amitnandan.vercel.app", lastModified: new Date() }];
+  return [{ url: siteUrl, lastModified: new Date() }];
 }

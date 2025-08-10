@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-
-const siteUrl = "https://your-domain.com"; // replace with your live domain
+import { siteUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -18,23 +17,17 @@ export const metadata: Metadata = {
     url: siteUrl,
     title: "Amit Nandan — Portfolio",
     description: "Software Engineer — Backend & Full-Stack",
-    images: [
-      {
-        url: "/og.png", // place this in /public
-        width: 1200,
-        height: 630,
-        alt: "Amit Nandan — Portfolio",
-      },
-    ],
+    // Use dynamic OG route instead of static /og.png
+    images: [`${siteUrl}/opengraph-image`],
   },
   twitter: {
     card: "summary_large_image",
     title: "Amit Nandan — Portfolio",
     description: "Software Engineer — Backend & Full-Stack",
-    images: ["/og.png"],
+    images: [`${siteUrl}/opengraph-image`],
   },
   icons: {
-    icon: "/favicon.ico", // in /public
+    icon: "/favicon.ico",
   },
 };
 
