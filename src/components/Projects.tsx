@@ -10,7 +10,7 @@ const projects = [
       "Modular e-wallet system featuring Spring Boot backend, Hibernate, Kafka for real-time processing.",
     language: "Java",
     languageColor: "#b07219",
-    url: "https://github.com/amnandan/E-Wallet",
+    url: "https://github.com/amitnandan/E-Wallet",
   },
   {
     name: "Netflix Clone",
@@ -18,14 +18,14 @@ const projects = [
       "Responsive video streaming front-end using React and Redux Toolkit with Firebase auth and GPT-3.5 recommendations.",
     language: "TypeScript",
     languageColor: "#3178c6",
-    url: "https://github.com/amnandan/Netflix",
+    url: "https://github.com/amitnandan/Netflix",
   },
   {
     name: "MovieBookingSystem",
     description: "Full stack movie booking application.",
     language: "Java",
     languageColor: "#b07219",
-    url: "https://github.com/amnandan/MovieBookingSystem",
+    url: "https://github.com/amitnandan/MovieBookingSystem",
   },
   {
     name: "EmployeeManagement",
@@ -33,7 +33,7 @@ const projects = [
       "CRUD system for managing employee records with Spring Boot.",
     language: "Java",
     languageColor: "#b07219",
-    url: "https://github.com/amnandan/EmployeeManagement",
+    url: "https://github.com/amitnandan/EmployeeManagement",
   },
 ];
 
